@@ -2,17 +2,455 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
-<title>M&amp;J Airways · Terminal EHE</title>
-<meta http-equiv="refresh" content="0; url=https://claude.ai/artifact/SSK9UyXZghikDFiLDMWgcP">
-<script>location.replace('https://claude.ai/artifact/SSK9UyXZghikDFiLDMWgcP');</script>
+<title>Terminal EHE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=DM+Serif+Display&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
-body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0b0e13;color:#e8eaee;font-family:ui-monospace,Menlo,monospace;padding:16px;box-sizing:border-box;text-align:center}
-a{color:#f2c230}
+:root{
+  color-scheme: dark;
+  --ground:#0b0e13;
+  --panel:#141920;
+  --panel-edge:#232a35;
+  --tile:#1c222c;
+  --tile-shadow:#07090c;
+  --flap:#f2c230;
+  --ink:#e8eaee;
+  --muted:#9aa3b0;
+  --ok:#52d19a;
+  --warn:#ff8a4c;
+  --ivory:#f7f2e7;
+  --navy:#1f2a44;
+  --terra:#b8472f;
+  --ivory-muted:#5b5f66;
+  --display:'Big Shoulders Display','Arial Narrow',Impact,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --serif:'DM Serif Display',Georgia,'Times New Roman',serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--ground);margin:0}
+body{color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:780px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:flex;flex-direction:column;gap:28px}
+
+.preview{font-family:var(--mono);font-size:13px;line-height:1.45;color:var(--ground);background:var(--flap);padding:10px 14px;border-radius:6px}
+.preview b{font-weight:600}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px solid var(--panel-edge)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand svg{flex-shrink:0}
+.brand-name{font-family:var(--display);font-weight:800;font-size:28px;letter-spacing:.02em;text-transform:uppercase;line-height:1}
+.brand-sub{font-family:var(--mono);font-size:12px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.clock{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.clock-time{font-size:22px;font-weight:500;color:var(--flap);line-height:1.1}
+.clock-label{font-size:12px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+
+.label{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+h1,h2{font-family:var(--display);font-weight:800;text-transform:uppercase;letter-spacing:.02em;line-height:1;margin:0;text-wrap:balance}
+h1{font-size:clamp(40px,9vw,64px)}
+h2{font-size:clamp(24px,6.4vw,38px);hyphens:auto}
+
+/* Departure board */
+.board{background:var(--panel);border:1px solid var(--panel-edge);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.board-head,.board-row{display:grid;grid-template-columns:8.6em minmax(0,1fr) 4.2em 10.5em;gap:12px;align-items:center}
+.board-head{padding-bottom:8px;border-bottom:1px solid var(--panel-edge)}
+.board-row{font-family:var(--mono)}
+.flaps{display:flex;gap:2px;flex-wrap:nowrap;overflow:hidden}
+.flap{display:inline-flex;align-items:center;justify-content:center;width:1.18em;height:1.6em;background:var(--tile);color:var(--flap);font-family:var(--mono);font-weight:600;font-size:17px;border-radius:3px;position:relative;box-shadow:inset 0 -1px 0 var(--tile-shadow)}
+.flap::after{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--tile-shadow)}
+.gate{font-weight:600;color:var(--ink);font-size:15px}
+.status{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.status.warn{color:var(--warn)}
+.status.ok{color:var(--ok)}
+.blink{animation:blink 1.4s steps(2,start) infinite}
+@keyframes blink{to{visibility:hidden}}
+.h-gate{}
+@media (max-width:620px){
+  .board-head{display:none}
+  .board-row{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"flight status" "dest dest";row-gap:6px;padding-bottom:10px;border-bottom:1px solid var(--panel-edge)}
+  .board-row:last-child{border-bottom:0;padding-bottom:0}
+  .c-flight{grid-area:flight}.c-dest{grid-area:dest}.c-status{grid-area:status;text-align:right}
+  .c-gate{display:none}
+  .flap{font-size:14px}
+}
+
+/* Security check */
+.check{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px}
+@media (max-width:680px){.check{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--panel-edge);border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:16px}
+.steps{display:flex;gap:6px}
+.step{flex:1;height:6px;border-radius:3px;background:var(--tile)}
+.step.done{background:var(--ok)}
+.step.now{background:var(--flap)}
+.question{font-size:21px;font-weight:500;line-height:1.35;margin:0;text-wrap:balance}
+form{display:flex;flex-direction:column;gap:8px}
+.field{display:flex;gap:8px}
+input[type=text]{flex:1;min-width:0;font-family:var(--mono);font-size:17px;color:var(--ink);background:var(--ground);border:1px solid var(--panel-edge);border-radius:6px;padding:12px 14px}
+input[type=text]:focus-visible{outline:2px solid var(--flap);outline-offset:1px;border-color:transparent}
+button{font-family:var(--mono);font-weight:600;font-size:15px;letter-spacing:.06em;text-transform:uppercase;border-radius:6px;cursor:pointer;min-height:46px}
+button:focus-visible{outline:2px solid var(--flap);outline-offset:2px}
+.btn-main{background:var(--flap);color:var(--ground);border:0;padding:0 18px}
+.btn-main:hover{background:#ffd24a}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--panel-edge);padding:0 14px;font-size:13px;min-height:40px}
+.btn-ghost:hover{color:var(--ink);border-color:var(--muted)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.hint{font-size:15px;color:var(--flap);margin:0}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+
+.log{font-family:var(--mono);font-size:13px;line-height:1.6;color:var(--muted);background:var(--ground);border:1px solid var(--panel-edge);border-radius:6px;padding:12px 14px;min-height:150px;max-height:220px;overflow-y:auto;overflow-wrap:anywhere}
+.log p{margin:0}
+.log .ok{color:var(--ok)}
+.log .warn{color:var(--warn)}
+.log .hi{color:var(--ink)}
+
+.lock{display:flex;flex-direction:column;gap:14px;align-items:flex-start}
+.lock-tiles{display:flex;gap:8px}
+.lock-tile{width:64px;height:86px;display:flex;align-items:center;justify-content:center;background:var(--tile);color:var(--muted);font-family:var(--mono);font-weight:600;font-size:48px;border-radius:6px;position:relative;box-shadow:inset 0 -2px 0 var(--tile-shadow)}
+.lock-tile::after{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:var(--tile-shadow)}
+.lock-tile.open{color:var(--flap)}
+.lock-note{font-size:14px;color:var(--muted);margin:0}
+
+/* Final ticket */
+.ticket{background:var(--ivory);color:#1b1b1b;border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.ticket[hidden]{display:none!important}
+.ticket-band{background:var(--navy);color:var(--ivory);padding:14px 22px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.ticket-band .t-brand{font-family:var(--serif);font-size:24px}
+.ticket-band .t-kind{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+.ticket-body{padding:22px;display:flex;flex-direction:column;gap:18px}
+.ticket h2{font-family:var(--serif);text-transform:none;font-weight:400;letter-spacing:0;font-size:clamp(30px,6vw,40px);color:var(--navy)}
+.code-line{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.code-digits{display:flex;gap:6px}
+.code-digit{width:52px;height:68px;display:flex;align-items:center;justify-content:center;background:var(--navy);color:var(--ivory);font-family:var(--mono);font-weight:600;font-size:38px;border-radius:6px}
+.code-cap{font-family:var(--mono);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--ivory-muted)}
+.ticket p.msg{margin:0;font-size:17px;line-height:1.65;max-width:62ch}
+.ticket .sign{font-family:var(--serif);font-size:24px;color:var(--terra);margin:0}
+.ticket-foot{border-top:2px dashed #b9b2a3;padding:12px 22px;font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ivory-muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.reveal{animation:reveal .7s cubic-bezier(.2,.8,.2,1)}
+@keyframes reveal{from{transform:translateY(24px);opacity:.2}to{transform:none;opacity:1}}
+
+footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--muted);border-top:1px solid var(--panel-edge);padding-top:14px}
+footer p{margin:0;max-width:52ch}
+
+@media (prefers-reduced-motion:reduce){
+  .blink,.shake,.reveal{animation:none}
+}
 </style>
 </head>
 <body>
-<p>Verbinde mit Terminal EHE …<br><a href="https://claude.ai/artifact/SSK9UyXZghikDFiLDMWgcP">Weiter zum Check-in</a></p>
+
+<div class="wrap">
+  <div class="preview" id="preview" hidden><b>Vorschau:</b> Die echten Antworten und der Schlosscode kommen noch. Zum Testen jede Frage mit <b>test</b> beantworten.</div>
+
+  <header class="topbar">
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#f2c230" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+      <div>
+        <div class="brand-name">M&amp;J Airways</div>
+        <div class="brand-sub">Terminal EHE · Gepäckausgabe</div>
+      </div>
+    </div>
+    <div class="clock">
+      <div class="clock-time" id="clock">--:--:--</div>
+      <div class="clock-label">Ortszeit</div>
+    </div>
+  </header>
+
+  <section aria-labelledby="dep-title" style="display:flex;flex-direction:column;gap:12px">
+    <h1 id="dep-title">Abflug</h1>
+    <div class="board" role="table" aria-label="Abflugtafel">
+      <div class="board-head" role="row">
+        <span class="label" role="columnheader">Flug</span>
+        <span class="label" role="columnheader">Ziel</span>
+        <span class="label" role="columnheader">Gate</span>
+        <span class="label" role="columnheader">Status</span>
+      </div>
+      <div class="board-row" role="row">
+        <span class="c-flight flaps" role="cell" data-flap="MJ 420" id="mainFlight">MJ 420</span>
+        <span class="c-dest flaps" role="cell" data-flap="ÜBERALL">ÜBERALL</span>
+        <span class="c-gate gate" role="cell">EHE</span>
+        <span class="c-status status warn blink" role="cell" id="mainStatus">Gepäck gesperrt</span>
+      </div>
+      <div class="board-row" role="row">
+        <span class="c-flight flaps" role="cell" data-flap="MJ 0001">MJ 0001</span>
+        <span class="c-dest flaps" role="cell" data-flap="FLITTERWOCHEN">FLITTERWOCHEN</span>
+        <span class="c-gate gate" role="cell">EHE</span>
+        <span class="c-status status" role="cell">In Planung</span>
+      </div>
+      <div class="board-row" role="row">
+        <span class="c-flight flaps" role="cell" data-flap="MJ 0025">MJ 0025</span>
+        <span class="c-dest flaps" role="cell" data-flap="SILBERHOCHZEIT">SILBERHOCHZEIT</span>
+        <span class="c-gate gate" role="cell">EHE</span>
+        <span class="c-status status" role="cell">Geplant</span>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="sec-title" style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="sec-title">Sicherheitskontrolle</h2>
+    <div class="check">
+      <div class="panel" id="qPanel">
+        <div class="row" style="justify-content:space-between">
+          <span class="label" id="stepLabel">Kontrolle 1 von 3</span>
+        </div>
+        <div class="steps" aria-hidden="true"><span class="step now"></span><span class="step"></span><span class="step"></span></div>
+        <p class="question" id="question">Wie viele Länder habt ihr zusammen bereist?</p>
+        <form id="form" autocomplete="off">
+          <label class="label" for="answer">Eure Antwort</label>
+          <div class="field">
+            <input type="text" id="answer" name="answer" autocapitalize="off" spellcheck="false" placeholder="Antwort eingeben">
+            <button class="btn-main" type="submit">Prüfen</button>
+          </div>
+        </form>
+        <div class="row">
+          <button class="btn-ghost" type="button" id="hintBtn" aria-expanded="false" aria-controls="hint">Tipp anzeigen</button>
+        </div>
+        <p class="hint" id="hint" hidden></p>
+      </div>
+
+      <div class="panel lock">
+        <span class="label">Kofferschloss</span>
+        <div class="lock-tiles" aria-live="polite" aria-label="Schlosscode">
+          <span class="lock-tile" id="d0">?</span>
+          <span class="lock-tile" id="d1">?</span>
+          <span class="lock-tile" id="d2">?</span>
+        </div>
+        <p class="lock-note">Jede bestandene Kontrolle entschlüsselt eine Ziffer.</p>
+        <div class="log" id="log" aria-live="polite" role="log"></div>
+      </div>
+    </div>
+  </section>
+
+  <article class="ticket" id="ticket" hidden aria-labelledby="ticket-title">
+    <div class="ticket-band">
+      <span class="t-brand">M&amp;J Airways</span>
+      <span class="t-kind">Gepäck freigegeben</span>
+    </div>
+    <div class="ticket-body">
+      <h2 id="ticket-title">Liebe Jane, lieber Max!</h2>
+      <div class="code-line">
+        <div class="code-digits" id="codeDigits"><span class="code-digit">?</span><span class="code-digit">?</span><span class="code-digit">?</span></div>
+        <span class="code-cap">Euer Schlosscode</span>
+      </div>
+      <p class="msg">Im Koffer steckt euer Reisebudget für alles, was noch kommt: Flüge, Hotels, Cocktails am Strand und das eine Gelato zu viel. Wir wünschen euch eine Ehe wie eine richtig gute Reise: mit Neugier, schönen Umwegen und immer zwei Plätzen nebeneinander. Alles Liebe zur Hochzeit!</p>
+      <p class="sign" id="sign">Rudi</p>
+    </div>
+    <div class="ticket-foot"><span>Gate EHE · Sitz 1A + 1B</span><span>Ziel: Überall</span></div>
+  </article>
+
+  <footer>
+    <p>Der Code steht nicht im Quelltext. Jede Ziffer wird erst mit eurer richtigen Antwort per SHA-256 entschlüsselt.</p>
+    <button class="btn-ghost" type="button" id="reset">Neu starten</button>
+  </footer>
+</div>
+
+<script>
+(function(){
+  document.documentElement.lang = 'de';
+  // ---- Config: questions, hints and encrypted digits (generated) ----
+  var CFG = {
+    preview: true,
+    flight: 'MJ 420',
+    sign: 'Rudi',
+    questions: [
+      { q: 'Wie viele Länder habt ihr zusammen bereist?', hint: 'Zählt jedes Land, in dem ihr gemeinsam übernachtet habt. Eine Zahl genügt.',
+        salt: '27511520fd93a0b5', keys: [{h:'386928db8bf6df1e79d733782168a5468edb0d57ef501d0615db6ef0a2b6de87',e:1}] },
+      { q: 'Welches Land war euer allererstes gemeinsames Reiseziel?', hint: 'Der erste Stempel im gemeinsamen Reisepass. Auf Deutsch, ein Wort.',
+        salt: '0d64cbbbea6b5320', keys: [{h:'3bb7207b894f2c3c51fd838893d2948add7a4cddc85b6188daa4eaed89decbe6',e:5}] },
+      { q: 'Wie viele Tage kanntet ihr euch am Tag eurer Hochzeit?', hint: 'Zählt vom Tag eures Kennenlernens bis zum Hochzeitstag. Ein Tag daneben wird akzeptiert.',
+        salt: '83c6725e665eb553', keys: [{h:'61ae62be7812891e65c14cd7860e29f22698aba2ce1b2b82981ff054f7c9dfef',e:2}] }
+    ]
+  };
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var $ = function(id){ return document.getElementById(id); };
+  var STORE = 'mj-terminal-progress';
+  var state = { step: 0, digits: [null, null, null], wrong: 0 };
+  try { var saved = JSON.parse(localStorage.getItem(STORE) || 'null'); if (saved && Array.isArray(saved.digits)) state = saved; } catch(e) {}
+  function save(){ try { localStorage.setItem(STORE, JSON.stringify(state)); } catch(e) {} }
+
+  if (CFG.preview) $('preview').hidden = false;
+  $('sign').textContent = CFG.sign;
+  $('mainFlight').setAttribute('data-flap', CFG.flight);
+
+  // ---- Clock ----
+  function tick(){
+    var d = new Date(), p = function(n){ return String(n).padStart(2,'0'); };
+    $('clock').textContent = p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+  }
+  tick(); setInterval(tick, 1000);
+
+  // ---- Split-flap ----
+  var POOL = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜ0123456789';
+  function buildFlaps(el){
+    var text = el.getAttribute('data-flap');
+    el.textContent = '';
+    el.setAttribute('aria-label', text);
+    var cells = [];
+    for (var i = 0; i < text.length; i++){
+      var s = document.createElement('span');
+      s.className = 'flap'; s.setAttribute('aria-hidden','true');
+      s.textContent = text[i] === ' ' ? ' ' : text[i];
+      el.appendChild(s); cells.push({ el: s, ch: text[i] });
+    }
+    return cells;
+  }
+  function spin(cells, delayBase){
+    if (reduce) return;
+    cells.forEach(function(c, i){
+      if (c.ch === ' ') return;
+      var rounds = 6 + i * 2 + (delayBase || 0), n = 0;
+      var t = setInterval(function(){
+        n++;
+        if (n >= rounds){ c.el.textContent = c.ch; clearInterval(t); return; }
+        c.el.textContent = POOL[Math.floor(Math.random() * POOL.length)];
+      }, 55);
+    });
+  }
+  document.querySelectorAll('[data-flap]').forEach(function(el, r){ spin(buildFlaps(el), r * 3); });
+
+  function flipDigit(el, digit, done){
+    el.classList.add('open');
+    if (reduce){ el.textContent = digit; if (done) done(); return; }
+    var n = 0, t = setInterval(function(){
+      n++;
+      if (n >= 14){ el.textContent = digit; clearInterval(t); if (done) done(); return; }
+      el.textContent = Math.floor(Math.random() * 10);
+    }, 60);
+  }
+
+  // ---- Log ----
+  function log(text, cls){
+    var p = document.createElement('p');
+    if (cls) p.className = cls;
+    p.textContent = '> ' + text;
+    $('log').appendChild(p);
+    $('log').scrollTop = $('log').scrollHeight;
+  }
+
+  // ---- Crypto ----
+  var enc = new TextEncoder();
+  function sha(s){ return crypto.subtle.digest('SHA-256', enc.encode(s)).then(function(b){ return new Uint8Array(b); }); }
+  function hex(u){ return Array.prototype.map.call(u, function(x){ return x.toString(16).padStart(2,'0'); }).join(''); }
+  function norm(s){
+    return s.toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss')
+      .normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'');
+  }
+  function check(qi, raw){
+    var q = CFG.questions[qi], n = norm(raw);
+    if (!n) return Promise.resolve(null);
+    return sha(q.salt + '|' + n).then(function(h){
+      var hx = hex(h), key = null;
+      q.keys.forEach(function(k){ if (k.h === hx) key = k; });
+      if (!key) return null;
+      return sha('d|' + q.salt + '|' + n).then(function(d){ return ((key.e - d[0]) % 10 + 10) % 10; });
+    });
+  }
+
+  // ---- UI ----
+  function renderStep(){
+    var steps = document.querySelectorAll('.step');
+    steps.forEach(function(s, i){
+      s.className = 'step' + (i < state.step ? ' done' : i === state.step ? ' now' : '');
+    });
+    state.digits.forEach(function(d, i){
+      var el = $('d' + i);
+      if (d === null){ el.textContent = '?'; el.classList.remove('open'); }
+      else { el.textContent = d; el.classList.add('open'); }
+    });
+    if (state.step < 3){
+      var q = CFG.questions[state.step];
+      $('stepLabel').textContent = 'Kontrolle ' + (state.step + 1) + ' von 3';
+      $('question').textContent = q.q;
+      $('hint').textContent = q.hint;
+      $('hint').hidden = true;
+      $('hintBtn').setAttribute('aria-expanded', 'false');
+      $('hintBtn').textContent = 'Tipp anzeigen';
+      $('form').hidden = false; $('hintBtn').hidden = false;
+    } else {
+      $('stepLabel').textContent = 'Alle Kontrollen bestanden';
+      $('question').textContent = 'Willkommen an Bord. Euer Gepäck ist freigegeben.';
+      $('form').hidden = true; $('hintBtn').hidden = true; $('hint').hidden = true;
+    }
+  }
+
+  function finish(animate){
+    var status = $('mainStatus');
+    status.textContent = 'Boarding';
+    status.className = 'c-status status ok';
+    var digs = $('codeDigits').children;
+    for (var i = 0; i < 3; i++) digs[i].textContent = state.digits[i];
+    var t = $('ticket');
+    t.hidden = false;
+    if (animate){
+      t.classList.add('reveal');
+      setTimeout(function(){ t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); }, 250);
+    }
+  }
+
+  $('hintBtn').addEventListener('click', function(){
+    var h = $('hint'), open = h.hidden;
+    h.hidden = !open;
+    this.setAttribute('aria-expanded', String(open));
+    this.textContent = open ? 'Tipp ausblenden' : 'Tipp anzeigen';
+    if (open) log('Tipp angefordert.');
+  });
+
+  var busy = false;
+  $('form').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    if (busy || state.step > 2) return;
+    var input = $('answer'), raw = input.value;
+    if (!raw.trim()){ log('Bitte zuerst eine Antwort eingeben.', 'warn'); input.focus(); return; }
+    if (!window.crypto || !crypto.subtle){ log('Dieser Browser kann nicht entschlüsseln. Bitte mit einem aktuellen Browser öffnen.', 'warn'); return; }
+    busy = true;
+    log('Scanne Antwort „' + raw.trim() + '“ …', 'hi');
+    check(state.step, raw).then(function(digit){
+      setTimeout(function(){
+        if (digit === null){
+          state.wrong++;
+          log('Zugriff verweigert. Versucht es noch einmal.', 'warn');
+          var p = $('qPanel'); p.classList.remove('shake'); void p.offsetWidth; p.classList.add('shake');
+          if (state.wrong >= 2 && $('hint').hidden) log('Tipp: Der Button „Tipp anzeigen“ hilft weiter.');
+          busy = false; input.select(); save(); return;
+        }
+        var i = state.step;
+        log('Zugriff gewährt. Ziffer ' + (i + 1) + ' entschlüsselt.', 'ok');
+        state.digits[i] = digit; state.step++; state.wrong = 0; save();
+        input.value = '';
+        flipDigit($('d' + i), digit, function(){
+          renderStep(); busy = false;
+          if (state.step === 3){ log('Alle Kontrollen bestanden. Gepäck freigegeben.', 'ok'); finish(true); }
+          else input.focus();
+        });
+      }, reduce ? 0 : 500);
+    }).catch(function(){ busy = false; log('Fehler beim Entschlüsseln. Bitte Seite neu laden.', 'warn'); });
+  });
+
+  $('reset').addEventListener('click', function(){
+    state = { step: 0, digits: [null, null, null], wrong: 0 }; save();
+    $('ticket').hidden = true; $('ticket').classList.remove('reveal');
+    var status = $('mainStatus'); status.textContent = 'Gepäck gesperrt'; status.className = 'c-status status warn blink';
+    $('log').textContent = ''; boot(); renderStep(); $('answer').focus();
+  });
+
+  function boot(){
+    log('M&J Airways Check-in-System v2.0 gestartet.');
+    log('Passagiere: Jane & Max. Gepäckstück 1 von 1 gesperrt.');
+    log('3 Sicherheitskontrollen erforderlich.', 'hi');
+  }
+
+  boot(); renderStep();
+  if (state.step >= 3) finish(false);
+
+  try {
+    console.log('%cHallo Max.', 'font:600 16px monospace;color:#f2c230');
+    console.log('Der Schlosscode steht hier nicht drin. Jede Ziffer ist mit eurer Antwort als Schlüssel verschlüsselt (SHA-256, gesalzen). Brute Force ist erlaubt, aber Raten geht schneller.');
+  } catch(e) {}
+})();
+</script>
 </body>
 </html>

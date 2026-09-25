@@ -55,7 +55,7 @@ h2{font-size:clamp(24px,6.4vw,38px);hyphens:auto}
 
 /* Departure board */
 .board{background:var(--panel);border:1px solid var(--panel-edge);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:10px}
-.board-head,.board-row{display:grid;grid-template-columns:8.6em minmax(0,1fr) 4.2em 10.5em;gap:12px;align-items:center}
+.board-head,.board-row{display:grid;grid-template-columns:8.6em minmax(0,1fr) 7.2em 10.5em;gap:12px;align-items:center}
 .board-head{padding-bottom:8px;border-bottom:1px solid var(--panel-edge)}
 .board-row{font-family:var(--mono)}
 .flaps{display:flex;gap:2px;flex-wrap:nowrap;overflow:hidden}
@@ -132,7 +132,7 @@ button:focus-visible{outline:2px solid var(--flap);outline-offset:2px}
 .reveal{animation:reveal .7s cubic-bezier(.2,.8,.2,1)}
 @keyframes reveal{from{transform:translateY(24px);opacity:.2}to{transform:none;opacity:1}}
 
-footer{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--muted);border-top:1px solid var(--panel-edge);padding-top:14px}
+footer{display:flex;justify-content:flex-end;align-items:center;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--muted);border-top:1px solid var(--panel-edge);padding-top:14px}
 footer p{margin:0;max-width:52ch}
 
 @media (prefers-reduced-motion:reduce){
@@ -170,8 +170,8 @@ footer p{margin:0;max-width:52ch}
       </div>
       <div class="board-row" role="row">
         <span class="c-flight flaps" role="cell" data-flap="MJ 420" id="mainFlight">MJ 420</span>
-        <span class="c-dest flaps" role="cell" data-flap="ÜBERALL">ÜBERALL</span>
-        <span class="c-gate gate" role="cell">EHE</span>
+        <span class="c-dest flaps" role="cell" data-flap="EHE">EHE</span>
+        <span class="c-gate gate" role="cell">SCHORNDORF</span>
         <span class="c-status status warn blink" role="cell" id="mainStatus">Gepäck gesperrt</span>
       </div>
       <div class="board-row" role="row">
@@ -197,7 +197,7 @@ footer p{margin:0;max-width:52ch}
           <span class="label" id="stepLabel">Kontrolle 1 von 3</span>
         </div>
         <div class="steps" aria-hidden="true"><span class="step now"></span><span class="step"></span><span class="step"></span></div>
-        <p class="question" id="question">Wie viele Länder habt ihr zusammen bereist?</p>
+        <p class="question" id="question">Welches Land war euer allererstes gemeinsames Reiseziel?</p>
         <form id="form" autocomplete="off">
           <label class="label" for="answer">Eure Antwort</label>
           <div class="field">
@@ -236,13 +236,12 @@ footer p{margin:0;max-width:52ch}
         <span class="code-cap">Euer Schlosscode</span>
       </div>
       <p class="msg">Im Koffer steckt euer Reisebudget für alles, was noch kommt: Flüge, Hotels, Cocktails am Strand und das eine Gelato zu viel. Wir wünschen euch eine Ehe wie eine richtig gute Reise: mit Neugier, schönen Umwegen und immer zwei Plätzen nebeneinander. Alles Liebe zur Hochzeit!</p>
-      <p class="sign" id="sign">Rudi</p>
+      <p class="sign" id="sign">Rudi, Caro, Emil &amp; Fussel</p>
     </div>
-    <div class="ticket-foot"><span>Gate EHE · Sitz 1A + 1B</span><span>Ziel: Überall</span></div>
+    <div class="ticket-foot"><span>Gate Schorndorf · Sitz 1A 1B</span><span>Ziel: Ehe</span></div>
   </article>
 
   <footer>
-    <p>Der Code steht nicht im Quelltext. Jede Ziffer wird erst mit eurer richtigen Antwort per SHA-256 entschlüsselt.</p>
     <button class="btn-ghost" type="button" id="reset">Neu starten</button>
   </footer>
 </div>
@@ -254,20 +253,20 @@ footer p{margin:0;max-width:52ch}
   var CFG = {
     preview: true,
     flight: 'MJ 420',
-    sign: 'Rudi',
+    sign: 'Rudi, Caro, Emil & Fussel',
     questions: [
-      { q: 'Wie viele Länder habt ihr zusammen bereist?', hint: 'Zählt jedes Land, in dem ihr gemeinsam übernachtet habt. Eine Zahl genügt.',
-        salt: '27511520fd93a0b5', keys: [{h:'386928db8bf6df1e79d733782168a5468edb0d57ef501d0615db6ef0a2b6de87',e:1}] },
       { q: 'Welches Land war euer allererstes gemeinsames Reiseziel?', hint: 'Der erste Stempel im gemeinsamen Reisepass. Auf Deutsch, ein Wort.',
-        salt: '0d64cbbbea6b5320', keys: [{h:'3bb7207b894f2c3c51fd838893d2948add7a4cddc85b6188daa4eaed89decbe6',e:5}] },
+        salt: '67da1a665ab2a16b', keys: [{h:'3ba7f99dcd5ef4349a5ac605a25d9fa169d2d288fdfc04b396d55fe76b1df374',e:0}] },
+      { q: 'Technik-Check: Ein echter Techniker schaut unter die Haube. Welche Zahl versteckt sich dort?', hint: 'Kann nur am PC gelöst werden.',
+        salt: '4cefab60622f408d', keys: [{h:'6c18e15d7352ee0628f35bb04a8743849364c9768a46c40e01bcd67bb3ef5eac',e:9},{h:'7cc7ff1669708a2d27b566953f6a3fb5562d7a391320bb340f640ddffbf4258d',e:8},{h:'11b5404f3597564ecf3eb3634d14ec9af856bab7f8f728a9d9f45c35ea902fe3',e:1}] },
       { q: 'Wie viele Tage kanntet ihr euch am Tag eurer Hochzeit?', hint: 'Zählt vom Tag eures Kennenlernens bis zum Hochzeitstag. Ein Tag daneben wird akzeptiert.',
-        salt: '83c6725e665eb553', keys: [{h:'61ae62be7812891e65c14cd7860e29f22698aba2ce1b2b82981ff054f7c9dfef',e:2}] }
+        salt: 'ea1c178c72cd392b', keys: [{h:'cbd5fe98e91db0164e42f2671d7c3c25d45611008587fccb00190c3fd7c7feb4',e:4}] }
     ]
   };
 
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var $ = function(id){ return document.getElementById(id); };
-  var STORE = 'mj-terminal-progress';
+  var STORE = 'mj-terminal-progress-v2';
   var state = { step: 0, digits: [null, null, null], wrong: 0 };
   try { var saved = JSON.parse(localStorage.getItem(STORE) || 'null'); if (saved && Array.isArray(saved.digits)) state = saved; } catch(e) {}
   function save(){ try { localStorage.setItem(STORE, JSON.stringify(state)); } catch(e) {} }
@@ -447,8 +446,8 @@ footer p{margin:0;max-width:52ch}
   if (state.step >= 3) finish(false);
 
   try {
-    console.log('%cHallo Max.', 'font:600 16px monospace;color:#f2c230');
-    console.log('Der Schlosscode steht hier nicht drin. Jede Ziffer ist mit eurer Antwort als Schlüssel verschlüsselt (SHA-256, gesalzen). Brute Force ist erlaubt, aber Raten geht schneller.');
+    console.log('%cHallo Max! Schön, dass du unter die Haube schaust.', 'font:600 15px monospace;color:#9aa3b0');
+    console.log('%cDie zweite Zahl ist 5!', 'font:700 30px monospace;color:#0b0e13;background:#f2c230;padding:10px 18px;border-radius:6px');
   } catch(e) {}
 })();
 </script>

@@ -135,6 +135,18 @@ button:focus-visible{outline:2px solid var(--flap);outline-offset:2px}
 footer{display:flex;justify-content:flex-end;align-items:center;gap:12px;flex-wrap:wrap;font-family:var(--mono);font-size:12px;color:var(--muted);border-top:1px solid var(--panel-edge);padding-top:14px}
 footer p{margin:0;max-width:52ch}
 
+/* Minigame: Anreise */
+.drive-intro{margin:0;color:var(--muted);max-width:62ch}
+.game{position:relative;width:100%;max-width:400px;margin:0 auto;aspect-ratio:3/4;border-radius:10px;overflow:hidden;border:1px solid var(--panel-edge);background:#12161d}
+.game canvas{display:block;width:100%;height:100%;touch-action:manipulation;cursor:pointer}
+.game-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;background:rgba(11,14,19,.84)}
+.game-overlay p{margin:0;max-width:30ch;color:var(--ink)}
+.game-title{font-family:var(--display);font-weight:800;font-size:36px;letter-spacing:.02em;text-transform:uppercase;line-height:1;color:var(--flap)}
+.game-controls{display:flex;gap:10px;justify-content:center}
+.game-controls button{min-width:130px;min-height:48px;font-size:14px}
+.locked{flex-direction:row;align-items:center;gap:14px}
+.locked p{margin:0;color:var(--muted)}
+
 @media (prefers-reduced-motion:reduce){
   .blink,.shake,.reveal{animation:none}
 }
@@ -189,15 +201,37 @@ footer p{margin:0;max-width:52ch}
     </div>
   </section>
 
+  <section aria-labelledby="drive-title" style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="drive-title">Anreise</h2>
+    <p class="drive-intro">Ohne Anreise kein Abflug. Fahrt von Schorndorf zum Flughafen und weicht Baustellen und Verkehr aus. Nach drei Treffern steckt ihr im Stau.</p>
+    <div class="game" id="game">
+      <canvas id="gameCanvas" role="img" aria-label="Minispiel: Fahrt von Schorndorf zum Flughafen STR"></canvas>
+      <div class="game-overlay" id="gameOverlay">
+        <div class="game-title" id="gameTitle">Schorndorf → STR</div>
+        <p id="gameText">Tippt links oder rechts auf die Straße, um die Spur zu wechseln. Am PC gehen auch die Pfeiltasten.</p>
+        <button class="btn-main" type="button" id="gameBtn">Losfahren</button>
+        <button class="btn-ghost" type="button" id="gameSkip" hidden>Abkürzung nehmen</button>
+      </div>
+    </div>
+    <div class="game-controls">
+      <button class="btn-ghost" type="button" id="laneLeft">◀ Links</button>
+      <button class="btn-ghost" type="button" id="laneRight">Rechts ▶</button>
+    </div>
+  </section>
+
   <section aria-labelledby="sec-title" style="display:flex;flex-direction:column;gap:12px">
     <h2 id="sec-title">Sicherheitskontrolle</h2>
-    <div class="check">
+    <div class="panel locked" id="secLocked">
+      <span class="label">Gesperrt</span>
+      <p>Die Sicherheitskontrolle öffnet, sobald ihr am Flughafen angekommen seid.</p>
+    </div>
+    <div class="check" id="secBody">
       <div class="panel" id="qPanel">
         <div class="row" style="justify-content:space-between">
           <span class="label" id="stepLabel">Kontrolle 1 von 3</span>
         </div>
         <div class="steps" aria-hidden="true"><span class="step now"></span><span class="step"></span><span class="step"></span></div>
-        <p class="question" id="question">Welches Land war euer allererstes gemeinsames Reiseziel?</p>
+        <p class="question" id="question">Wohin ging eure erste große gemeinsame Reise?</p>
         <form id="form" autocomplete="off">
           <label class="label" for="answer">Eure Antwort</label>
           <div class="field">
@@ -251,23 +285,23 @@ footer p{margin:0;max-width:52ch}
   document.documentElement.lang = 'de';
   // ---- Config: questions, hints and encrypted digits (generated) ----
   var CFG = {
-    preview: true,
+    preview: false,
     flight: 'MJ 420',
     sign: 'Rudi, Caro, Emil & Fussel',
     questions: [
-      { q: 'Welches Land war euer allererstes gemeinsames Reiseziel?', hint: 'Der erste Stempel im gemeinsamen Reisepass. Auf Deutsch, ein Wort.',
-        salt: '67da1a665ab2a16b', keys: [{h:'3ba7f99dcd5ef4349a5ac605a25d9fa169d2d288fdfc04b396d55fe76b1df374',e:0}] },
+      { q: 'Wohin ging eure erste große gemeinsame Reise?', hint: 'Die erste richtig große Reise, mit Langstreckenflug. Ein Land genügt.',
+        salt: '63d87db85efba82a', keys: [{h:'3631252b7d609ba285bcf0193ac280c9073977eeae7142379f7894f336736a1c',e:9},{h:'a0714d2c4579a634dfb173a22e51415eb00aa11a374eb81cc28d6076aacecae7',e:5},{h:'3631252b7d609ba285bcf0193ac280c9073977eeae7142379f7894f336736a1c',e:9},{h:'1fe0837f5a792b4863024e65fae2f0d85d568ba33a25998f7dd0013b2778e31c',e:7},{h:'9fd811a14597ccb1c01d3fc685af6703cf59fc5c21670a84384f81f23a50923e',e:5},{h:'49a4e3fd4c837e80fc3aa8a5a75071bc41032c93dd7fab9a9ee854458087a2da',e:8},{h:'68fd6d1fa74d079f8e4421794a84c71c1e63c6ada2ecf5f24927b693d2589770',e:5},{h:'a1311b873a5bfb9bc7a50e93158315663490e61a365ca51b748bb28d66e18f6b',e:8},{h:'399af5482cf2da93863ed965412f84dc99930f03033ef318f9e65dd5a9684c80',e:0},{h:'938bddf6b063589ea769b487b822844f8435e082115bca62312026cd094fdab7',e:7},{h:'521bde1c84e698e013cc995b3770b6d994cc2621c272ea8458b0b62f83644373',e:5},{h:'31a121b698e45ebfbd7149cf7d8cb1cf31facd0dbdf52ca2b3e9c153ec8f5509',e:8},{h:'39c6239e5de48112962fafbf4dd44581cfec68bf3c626145a103aa1e969682bd',e:3},{h:'1af80b5cf0eb7f5f090c9b3ec6d94295649376d82a4035613236dc229761f054',e:3,m:1},{h:'4103e5134042a44c5bf813c1b54d0730761f2fc7e4d76aa279db891b684c114a',e:6,m:1},{h:'46e188fec36c366a46e63003c7ae3a1df1b719d32ebe472052770e9d11a4857d',e:3,m:1},{h:'5c0c0f144eac2f9660c039bf516a804abc46764cd5f49400fb820530c97e63a9',e:4,m:1},{h:'aca44384d53b666a5627b1e61da0b1b09a49438fc882e209f4948311a376d79d',e:2,m:1},{h:'ff0d5201e78bb59eab5522f8f16bae0753a1fd25c1b6332d8d3c954d274192b3',e:2,m:1},{h:'152b1b01ddb9e682fd17de7f18ecc528e8ca2a24813063e364677d9f4ba55743',e:0,m:1}] },
       { q: 'Technik-Check: Ein echter Techniker schaut unter die Haube. Welche Zahl versteckt sich dort?', hint: 'Kann nur am PC gelöst werden.',
-        salt: '4cefab60622f408d', keys: [{h:'6c18e15d7352ee0628f35bb04a8743849364c9768a46c40e01bcd67bb3ef5eac',e:9},{h:'7cc7ff1669708a2d27b566953f6a3fb5562d7a391320bb340f640ddffbf4258d',e:8},{h:'11b5404f3597564ecf3eb3634d14ec9af856bab7f8f728a9d9f45c35ea902fe3',e:1}] },
-      { q: 'Wie viele Tage kanntet ihr euch am Tag eurer Hochzeit?', hint: 'Zählt vom Tag eures Kennenlernens bis zum Hochzeitstag. Ein Tag daneben wird akzeptiert.',
-        salt: 'ea1c178c72cd392b', keys: [{h:'cbd5fe98e91db0164e42f2671d7c3c25d45611008587fccb00190c3fd7c7feb4',e:4}] }
+        salt: 'a53265a48d877cd2', keys: [{h:'980cec2cdd8c0315e0a747401d7efcb01a7c3a82fab93b7df8cee9ee22da8d42',e:5},{h:'96c30530ac8017264080d859e2a4d13d431fc8267eebbffcb2fdd9edd8aaceb9',e:5}] },
+      { q: 'Wie viele Tage kanntet ihr euch am Tag eurer Hochzeit?', hint: 'Die Hochzeit fällt genau auf euren Kennenlerntag. Schaltjahre nicht vergessen! Ein Tag daneben zählt auch.',
+        salt: '453c085060fa61ea', keys: [{h:'1bff80b182463f2758ea5ddee15610e91324421d2f7f6e3cac12759a7d743044',e:1},{h:'a46e6dd3045029575fdc92317f302e6fcf5e53b7776ed47fafed6900b30313f2',e:6},{h:'23b4c19cb240fb190644b2bceebf43ecf0868f197e3e27600a19ab0e30713543',e:6}] }
     ]
   };
 
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var $ = function(id){ return document.getElementById(id); };
-  var STORE = 'mj-terminal-progress-v2';
-  var state = { step: 0, digits: [null, null, null], wrong: 0 };
+  var STORE = 'mj-terminal-progress-v3';
+  var state = { step: 0, digits: [null, null, null], wrong: 0, arrived: false };
   try { var saved = JSON.parse(localStorage.getItem(STORE) || 'null'); if (saved && Array.isArray(saved.digits)) state = saved; } catch(e) {}
   function save(){ try { localStorage.setItem(STORE, JSON.stringify(state)); } catch(e) {} }
 
@@ -338,14 +372,21 @@ footer p{margin:0;max-width:52ch}
     return s.toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss')
       .normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'');
   }
-  function check(qi, raw){
-    var q = CFG.questions[qi], n = norm(raw);
-    if (!n) return Promise.resolve(null);
+  function checkOne(q, n){
     return sha(q.salt + '|' + n).then(function(h){
       var hx = hex(h), key = null;
       q.keys.forEach(function(k){ if (k.h === hx) key = k; });
       if (!key) return null;
+      if (key.m) log('Das war eure erste kleine Reise. Zählt trotzdem, gemeint war aber die große!', 'hi');
       return sha('d|' + q.salt + '|' + n).then(function(d){ return ((key.e - d[0]) % 10 + 10) % 10; });
+    });
+  }
+  function check(qi, raw){
+    var q = CFG.questions[qi], n = norm(raw), digits = String(raw).replace(/\D/g, '');
+    if (!n) return Promise.resolve(null);
+    return checkOne(q, n).then(function(r){
+      if (r !== null || !digits || digits === n) return r;
+      return checkOne(q, digits);
     });
   }
 
@@ -430,19 +471,548 @@ footer p{margin:0;max-width:52ch}
   });
 
   $('reset').addEventListener('click', function(){
-    state = { step: 0, digits: [null, null, null], wrong: 0 }; save();
+    state = { step: 0, digits: [null, null, null], wrong: 0, arrived: false }; save();
     $('ticket').hidden = true; $('ticket').classList.remove('reveal');
     var status = $('mainStatus'); status.textContent = 'Gepäck gesperrt'; status.className = 'c-status status warn blink';
-    $('log').textContent = ''; boot(); renderStep(); $('answer').focus();
+    $('log').textContent = ''; boot(); renderStep(); applyArrived(); game.showStart();
   });
 
   function boot(){
     log('M&J Airways Check-in-System v2.0 gestartet.');
     log('Passagiere: Jane & Max. Gepäckstück 1 von 1 gesperrt.');
     log('3 Sicherheitskontrollen erforderlich.', 'hi');
+    if (!state.arrived) log('Anreise zum Flughafen ausstehend.');
   }
 
-  boot(); renderStep();
+
+  // ---- Arrival lock ----
+  function applyArrived(){
+    $('secLocked').hidden = !!state.arrived;
+    $('secBody').hidden = !state.arrived;
+  }
+  function arrive(viaShortcut){
+    if (state.arrived) return;
+    state.arrived = true; save(); applyArrived();
+    log(viaShortcut ? 'Abkürzung genommen. Ankunft STR.' : 'Ankunft STR. Pünktlich wie nie.', 'ok');
+    log('Sicherheitskontrolle geöffnet.', 'ok');
+  }
+
+  // ---- Minigame: Anreise Schorndorf -> STR ----
+  var game = (function(){
+    var cv = $('gameCanvas'), ctx = cv.getContext('2d');
+    var W = 0, H = 0, LANES = 3, TOTAL = 32;
+    var roadX = 0, roadW = 0, laneW = 0, grassW = 0;
+    var g = null, running = false, raf = 0, last = 0, attempts = 0;
+    var asphaltTile = null, grassTile = null, vignette = null, asphaltPat = null, grassPat = null;
+    var CAR_COLORS = ['#c0392b', '#2e86de', '#e1b12c', '#4b5d7a', '#1e8449', '#8e44ad', '#d35400', '#7f8c8d', '#16a085'];
+    var CAR_REL = 0.8;
+    var DISPLAY = '"Big Shoulders Display", Impact, "Arial Narrow", sans-serif';
+    var MONO = '"IBM Plex Mono", ui-monospace, monospace';
+
+    // ---------- setup ----------
+    function makeTiles(){
+      var a = document.createElement('canvas'); a.width = a.height = 128;
+      var x = a.getContext('2d');
+      x.fillStyle = '#3d424b'; x.fillRect(0, 0, 128, 128);
+      for (var i = 0; i < 1400; i++) {
+        x.fillStyle = Math.random() < 0.5 ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.14)';
+        x.fillRect(Math.random() * 128, Math.random() * 128, 1 + Math.random() * 1.6, 1 + Math.random() * 1.6);
+      }
+      asphaltTile = a;
+      var b = document.createElement('canvas'); b.width = b.height = 96;
+      var y = b.getContext('2d');
+      y.fillStyle = '#4b8040'; y.fillRect(0, 0, 96, 96);
+      for (var j = 0; j < 520; j++) {
+        var px = Math.random() * 96, py = Math.random() * 96;
+        y.strokeStyle = Math.random() < 0.5 ? 'rgba(20,60,20,0.35)' : 'rgba(170,220,120,0.22)';
+        y.lineWidth = 1; y.beginPath(); y.moveTo(px, py); y.lineTo(px + (Math.random() - 0.5) * 3, py - 2 - Math.random() * 4); y.stroke();
+      }
+      grassTile = b;
+    }
+    function size(){
+      var r = cv.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+      if (!r.width) return;
+      W = r.width; H = r.height;
+      cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      roadW = W * 0.6; roadX = (W - roadW) / 2; laneW = roadW / LANES; grassW = roadX;
+      if (!asphaltTile) makeTiles();
+      asphaltPat = ctx.createPattern(asphaltTile, 'repeat'); grassPat = ctx.createPattern(grassTile, 'repeat');
+      vignette = ctx.createRadialGradient(W / 2, H * 0.55, H * 0.25, W / 2, H * 0.55, H * 0.85);
+      vignette.addColorStop(0, 'rgba(0,0,0,0)'); vignette.addColorStop(1, 'rgba(0,0,0,0.35)');
+      if (g) { g.x = laneX(g.lane); }
+      draw();
+    }
+    function laneX(l){ return roadX + laneW * (l + 0.5); }
+
+    function newGame(){
+      g = { lane: 1, x: laneX(1), vx: 0, t: 0, count: 2.4, lives: 3, obs: [], deco: [], parts: [],
+            spawn: 0.6, inv: 0, shake: 0, flash: 0, scroll: 0, done: false, row: 0,
+            nextDeco: [20, 60], nextLamp: 140, nextSign: 5, plane: null, terminal: null, heartT: 0 };
+      // Ortsausgangsschild Schorndorf at the start
+      g.deco.push({ type: 'town', side: 1, y: H * 0.42 });
+      for (var i = 0; i < 8; i++) {
+        g.deco.push({ type: Math.random() < 0.7 ? 'tree' : 'bush', side: i % 2 ? 1 : -1, y: Math.random() * H, off: Math.random(), s: 0.8 + Math.random() * 0.5 });
+      }
+    }
+    function progress(){ return Math.min(g.t / TOTAL, 1); }
+    function speed(){ return g.count > 0 ? 0 : H * (0.75 + 0.5 * progress()); }
+    function move(d){
+      if (!running || !g || g.count > 0) return;
+      var nl = Math.max(0, Math.min(LANES - 1, g.lane + d));
+      if (nl !== g.lane) { g.lane = nl; }
+    }
+
+    // ---------- spawning ----------
+    function rowsWouldBlock(lanes, rel, v){
+      // a static row spawned behind a slower car row may catch up on screen; never let them close all lanes
+      if (rel <= CAR_REL) return false;
+      var rows = {};
+      g.obs.forEach(function(o){ if (o.rel === CAR_REL) { (rows[o.row] = rows[o.row] || { y: o.y, lanes: {} }).lanes[o.lane] = 1; } });
+      for (var id in rows) {
+        var rr = rows[id], gap = rr.y + 160, tMeet = gap / (v * (1 - CAR_REL) + 1), yMeet = -80 + v * tMeet;
+        if (yMeet < H + 60) {
+          var all = {}; lanes.forEach(function(l){ all[l] = 1; }); for (var k in rr.lanes) all[k] = 1;
+          if (Object.keys(all).length >= LANES) return true;
+        }
+      }
+      return false;
+    }
+    function addObstacle(kind, lane, row){
+      var o = { kind: kind, lane: lane, x: laneX(lane), row: row, color: CAR_COLORS[Math.floor(Math.random() * CAR_COLORS.length)] };
+      if (kind === 'car')   { o.w = laneW * 0.52; o.h = o.w * 1.9; o.rel = CAR_REL; }
+      if (kind === 'van')   { o.w = laneW * 0.56; o.h = o.w * 2.2; o.rel = CAR_REL; o.color = Math.random() < 0.5 ? '#e8e8e4' : '#b8bec6'; }
+      if (kind === 'truck') { o.w = laneW * 0.62; o.h = o.w * 3.0; o.rel = CAR_REL; }
+      if (kind === 'cones') { o.w = laneW * 0.62; o.h = laneW * 0.34; o.rel = 1; }
+      if (kind === 'barrier') { o.w = laneW * 0.84; o.h = laneW * 0.3; o.rel = 1; }
+      o.y = -o.h - 20;
+      g.obs.push(o);
+    }
+    function spawn(v){
+      var p = progress();
+      var staticRow = Math.random() < 0.38;
+      var two = p > 0.3 && Math.random() < 0.45;
+      var lanes;
+      if (two) {
+        var frees = [0, 1, 2].filter(function(f){ return g.lastFree == null || Math.abs(f - g.lastFree) <= 1; });
+        var free = frees[Math.floor(Math.random() * frees.length)];
+        lanes = [0, 1, 2].filter(function(l){ return l !== free; }); g.lastFree = free;
+      } else {
+        lanes = [Math.floor(Math.random() * LANES)]; g.lastFree = null;
+      }
+      var rel = staticRow ? 1 : CAR_REL;
+      if (rowsWouldBlock(lanes, rel, v)) { staticRow = false; rel = CAR_REL; }
+      var row = ++g.row;
+      lanes.forEach(function(l){
+        var kind;
+        if (staticRow) kind = Math.random() < 0.55 ? 'cones' : 'barrier';
+        else { var r = Math.random(); kind = r < 0.6 ? 'car' : (r < 0.82 ? 'van' : 'truck'); }
+        addObstacle(kind, l, row);
+      });
+      g.spawn = (1.0 - 0.45 * p) * (two ? 1.25 : 1) + Math.random() * 0.25;
+    }
+    function spawnDeco(dist){
+      for (var s = 0; s < 2; s++) {
+        g.nextDeco[s] -= dist;
+        if (g.nextDeco[s] <= 0) {
+          g.deco.push({ type: Math.random() < 0.72 ? 'tree' : 'bush', side: s ? 1 : -1, y: -70, off: Math.random(), s: 0.8 + Math.random() * 0.55 });
+          g.nextDeco[s] = 55 + Math.random() * 110;
+        }
+      }
+      g.nextLamp -= dist;
+      if (g.nextLamp <= 0) { g.deco.push({ type: 'lamp', side: -1, y: -40 }); g.deco.push({ type: 'lamp', side: 1, y: -40 }); g.nextLamp = 260; }
+    }
+
+    // ---------- update ----------
+    function playerBox(){ var w = laneW * 0.5, h = w * 1.95; return { x: g.x - w / 2, y: H - h - 34, w: w, h: h }; }
+    function overlap(a, b, i){ return a.x + i < b.x + b.w - i && a.x + a.w - i > b.x + i && a.y + i < b.y + b.h - i && a.y + a.h - i > b.y + i; }
+    function burst(x, y, n, colors, spd, life){
+      for (var i = 0; i < n; i++) {
+        var a = Math.random() * Math.PI * 2, s = spd * (0.4 + Math.random() * 0.8);
+        g.parts.push({ x: x, y: y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, life: life * (0.6 + Math.random() * 0.6), max: life, c: colors[i % colors.length], r: 1.5 + Math.random() * 2.5, kind: 'dot' });
+      }
+    }
+
+    function step(dt){
+      if (g.count > 0) { g.count -= dt; if (g.count <= 0) log('Abfahrt Schorndorf. Gute Fahrt!'); }
+      var v = speed(), dist = v * dt;
+      if (g.count <= 0) g.t += dt;
+      var p = progress();
+      g.inv = Math.max(0, g.inv - dt); g.shake = Math.max(0, g.shake - dt); g.flash = Math.max(0, g.flash - dt * 2.5);
+      g.scroll += dist;
+      var ox = g.x; g.x += (laneX(g.lane) - g.x) * Math.min(1, dt * 12); g.vx = dt > 0 ? (g.x - ox) / dt : 0;
+
+      if (g.count <= 0) {
+        spawnDeco(dist);
+        if (g.t < TOTAL - 2.6) { g.spawn -= dt; if (g.spawn <= 0) spawn(v); }
+        g.nextSign -= dt;
+        if (g.nextSign <= 0 && g.t < TOTAL - 3) { g.deco.push({ type: 'sign', side: Math.random() < 0.5 ? -1 : 1, y: -60 }); g.nextSign = 7 + Math.random() * 3; }
+        if (!g.plane && p > 0.72) g.plane = { x: W + 120, y: -40, t: 0 };
+        if (!g.terminal && g.t > TOTAL - 1.8) g.terminal = { y: H * 0.36 - H * 0.3 - v * 1.8 };
+        g.heartT -= dt;
+        if (g.heartT <= 0) { var pb0 = playerBox(); g.parts.push({ x: g.x + (Math.random() - 0.5) * 10, y: pb0.y + pb0.h + 18, vx: (Math.random() - 0.5) * 20, vy: 40, life: 1.1, max: 1.1, c: '#e8607a', r: 5, kind: 'heart' }); g.heartT = 0.9 + Math.random() * 0.8; }
+      }
+
+      g.deco.forEach(function(d){ d.y += dist; });
+      g.deco = g.deco.filter(function(d){ return d.y < H + 120; });
+      if (g.plane) { g.plane.t += dt; g.plane.x -= W * 0.55 * dt; g.plane.y += H * 0.42 * dt; if (g.plane.y > H + 200) g.plane = { x: -9999, y: -9999, t: 99, gone: true }; }
+      if (g.terminal) g.terminal.y += v * dt;
+
+      var pb = playerBox();
+      for (var i = g.obs.length - 1; i >= 0; i--) {
+        var o = g.obs[i]; o.y += v * o.rel * dt;
+        if (o.y > H + 40) { g.obs.splice(i, 1); continue; }
+        if (g.inv <= 0 && overlap(pb, { x: o.x - o.w / 2, y: o.y, w: o.w, h: o.h }, 6)) {
+          g.obs.splice(i, 1); g.lives--; g.inv = 1.3; g.shake = 0.35; g.flash = 1;
+          burst(g.x, pb.y + 8, 18, ['#ffd166', '#ff8a4c', '#fff3c4'], 220, 0.6);
+          if (g.lives > 0) log((o.kind === 'cones' || o.kind === 'barrier' ? 'Baustelle erwischt' : 'Blechschaden') + '! Noch ' + g.lives + ' Leben.', 'warn');
+          if (g.lives <= 0) { crash(); return; }
+        }
+      }
+      for (var k = g.parts.length - 1; k >= 0; k--) {
+        var q = g.parts[k]; q.life -= dt; if (q.life <= 0) { g.parts.splice(k, 1); continue; }
+        q.x += q.vx * dt; q.y += q.vy * dt; if (q.kind === 'confetti') { q.vy += 160 * dt; q.rot += q.vr * dt; }
+      }
+      if (g.t >= TOTAL) finish();
+    }
+
+    // ---------- drawing helpers ----------
+    function rr(x, y, w, h, r){ r = Math.min(r, w / 2, h / 2); ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+    function heart(x, y, s, fill){ ctx.beginPath(); ctx.moveTo(x, y + s * 0.3); ctx.bezierCurveTo(x, y, x - s * 0.5, y, x - s * 0.5, y + s * 0.3); ctx.bezierCurveTo(x - s * 0.5, y + s * 0.6, x, y + s * 0.78, x, y + s); ctx.bezierCurveTo(x, y + s * 0.78, x + s * 0.5, y + s * 0.6, x + s * 0.5, y + s * 0.3); ctx.bezierCurveTo(x + s * 0.5, y, x, y, x, y + s * 0.3); ctx.fillStyle = fill; ctx.fill(); }
+    function shade(hex, f){
+      var n = parseInt(hex.slice(1), 16), r = n >> 16, gg = (n >> 8) & 255, b = n & 255;
+      var t = f < 0 ? 0 : 255, a = Math.abs(f);
+      return 'rgb(' + Math.round(r + (t - r) * a) + ',' + Math.round(gg + (t - gg) * a) + ',' + Math.round(b + (t - b) * a) + ')';
+    }
+    function planeTop(x, y, s, rot, fill){
+      ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(s, s); ctx.fillStyle = fill;
+      ctx.beginPath();
+      ctx.moveTo(0, -50); ctx.bezierCurveTo(6, -46, 6, -36, 6, -28); ctx.lineTo(6, -8); ctx.lineTo(48, 10); ctx.lineTo(48, 18); ctx.lineTo(6, 8);
+      ctx.lineTo(6, 34); ctx.lineTo(18, 44); ctx.lineTo(18, 50); ctx.lineTo(0, 45); ctx.lineTo(-18, 50); ctx.lineTo(-18, 44); ctx.lineTo(-6, 34);
+      ctx.lineTo(-6, 8); ctx.lineTo(-48, 18); ctx.lineTo(-48, 10); ctx.lineTo(-6, -8); ctx.lineTo(-6, -28); ctx.bezierCurveTo(-6, -36, -6, -46, 0, -50);
+      ctx.fill(); ctx.restore();
+    }
+
+    function drawGround(){
+      var off = g ? g.scroll : 0;
+      ctx.save(); ctx.translate(0, off % 96); ctx.fillStyle = grassPat; ctx.fillRect(0, -96, W, H + 192); ctx.restore();
+      // mowing stripes
+      ctx.fillStyle = 'rgba(255,255,255,0.035)';
+      for (var y = -80 + (off % 80); y < H; y += 80) { ctx.fillRect(0, y, roadX - 10, 40); ctx.fillRect(roadX + roadW + 10, y, W, 40); }
+      // shoulders
+      ctx.fillStyle = '#5b5f66'; ctx.fillRect(roadX - 10, 0, 10, H); ctx.fillRect(roadX + roadW, 0, 10, H);
+      // asphalt
+      ctx.save(); ctx.translate(0, off % 128); ctx.fillStyle = asphaltPat; ctx.fillRect(roadX, -128, roadW, H + 256); ctx.restore();
+      // tyre tracks
+      ctx.fillStyle = 'rgba(0,0,0,0.10)';
+      for (var l = 0; l < LANES; l++) { var cx = laneX(l); ctx.fillRect(cx - laneW * 0.2, 0, laneW * 0.1, H); ctx.fillRect(cx + laneW * 0.1, 0, laneW * 0.1, H); }
+      // edge lines
+      ctx.fillStyle = '#ecebe6'; ctx.fillRect(roadX + 4, 0, 3, H); ctx.fillRect(roadX + roadW - 7, 0, 3, H);
+      // lane dashes (German: white)
+      for (var k = 1; k < LANES; k++) {
+        var lx = roadX + laneW * k - 2;
+        for (var d = -60 + (off % 60); d < H; d += 60) ctx.fillRect(lx, d, 4, 30);
+      }
+      // guardrails
+      ctx.fillStyle = '#aeb6c0'; ctx.fillRect(roadX - 16, 0, 3, H); ctx.fillRect(roadX + roadW + 13, 0, 3, H);
+      ctx.fillStyle = '#7d858f';
+      for (var py = -40 + (off % 40); py < H; py += 40) { ctx.fillRect(roadX - 17, py, 5, 4); ctx.fillRect(roadX + roadW + 12, py, 5, 4); }
+    }
+
+    function drawDeco(d){
+      var gx = d.side < 0 ? roadX - 20 : roadX + roadW + 20;
+      if (d.type === 'tree' || d.type === 'bush') {
+        var big = d.type === 'tree', r = (big ? grassW * 0.34 : grassW * 0.2) * d.s;
+        var x = d.side < 0 ? 6 + r + d.off * Math.max(0, grassW - 30 - 2 * r) : W - 6 - r - d.off * Math.max(0, grassW - 30 - 2 * r);
+        ctx.fillStyle = 'rgba(0,0,0,0.22)'; ctx.beginPath(); ctx.arc(x + r * 0.35, d.y + r * 0.4, r, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = big ? '#2f6b34' : '#3f7d3a';
+        ctx.beginPath(); ctx.arc(x, d.y, r, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = big ? '#3c8a40' : '#4f9447';
+        ctx.beginPath(); ctx.arc(x - r * 0.3, d.y - r * 0.25, r * 0.62, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x + r * 0.35, d.y - r * 0.05, r * 0.45, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,0.10)'; ctx.beginPath(); ctx.arc(x - r * 0.38, d.y - r * 0.4, r * 0.28, 0, Math.PI * 2); ctx.fill();
+        if (big && d.off > 0.75) { ctx.fillStyle = '#e8607a'; [[-0.2, -0.1], [0.25, 0.2], [0.05, 0.4]].forEach(function(c){ ctx.beginPath(); ctx.arc(x + c[0] * r, d.y + c[1] * r, 2, 0, Math.PI * 2); ctx.fill(); }); }
+      } else if (d.type === 'lamp') {
+        var lx = d.side < 0 ? roadX - 24 : roadX + roadW + 24;
+        ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(lx + (d.side < 0 ? 4 : -22), d.y + 6, 22, 4);
+        ctx.fillStyle = '#6f7782'; ctx.fillRect(Math.min(lx, lx - d.side * 22), d.y, 22, 3);
+        ctx.fillStyle = '#ffe9a8'; ctx.beginPath(); ctx.arc(lx - d.side * 22, d.y + 1.5, 3.5, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#5b636d'; ctx.beginPath(); ctx.arc(lx, d.y + 1.5, 3.5, 0, Math.PI * 2); ctx.fill();
+      } else if (d.type === 'sign') {
+        var sw = Math.min(grassW - 14, 66), sh = sw * 0.62, sx = d.side < 0 ? (roadX - 20 - sw) : (roadX + roadW + 20);
+        sx = Math.max(4, Math.min(W - sw - 4, sx));
+        ctx.fillStyle = 'rgba(0,0,0,0.3)'; rr(sx + 3, d.y + 4, sw, sh, 4); ctx.fill();
+        ctx.fillStyle = '#1f4e9c'; rr(sx, d.y, sw, sh, 4); ctx.fill();
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5; rr(sx + 3, d.y + 3, sw - 6, sh - 6, 3); ctx.stroke();
+        planeTop(sx + sw * 0.3, d.y + sh * 0.5, sh * 0.006, Math.PI / 2, '#ffffff');
+        ctx.fillStyle = '#ffffff'; ctx.font = '700 ' + Math.round(sh * 0.36) + 'px ' + DISPLAY; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('STR', sx + sw * 0.68, d.y + sh * 0.52);
+      } else if (d.type === 'town') {
+        var tw = Math.min(grassW - 10, 72), th = tw * 0.62, tx = roadX + roadW + 18;
+        tx = Math.min(W - tw - 4, tx);
+        ctx.fillStyle = 'rgba(0,0,0,0.3)'; rr(tx + 3, d.y + 4, tw, th, 4); ctx.fill();
+        ctx.fillStyle = '#f2c230'; rr(tx, d.y, tw, th, 4); ctx.fill();
+        ctx.strokeStyle = '#1b1b1b'; ctx.lineWidth = 1.5; rr(tx + 3, d.y + 3, tw - 6, th - 6, 3); ctx.stroke();
+        ctx.fillStyle = '#1b1b1b'; ctx.font = '700 ' + Math.round(th * 0.27) + 'px ' + DISPLAY; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('SCHORNDORF', tx + tw / 2, d.y + th * 0.52);
+        ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(tx + 6, d.y + th - 6); ctx.lineTo(tx + tw - 6, d.y + 6); ctx.stroke();
+      }
+    }
+
+    function drawCar(o){
+      var x = o.x - o.w / 2, y = o.y, w = o.w, h = o.h, c = o.color;
+      ctx.fillStyle = 'rgba(0,0,0,0.3)'; rr(x + 3, y + 5, w, h, w * 0.3); ctx.fill();
+      if (o.kind === 'truck') {
+        var cab = h * 0.22;
+        ctx.fillStyle = c; rr(x + w * 0.04, y, w * 0.92, cab, 6); ctx.fill();
+        ctx.fillStyle = '#1b2430'; ctx.fillRect(x + w * 0.14, y + cab * 0.18, w * 0.72, cab * 0.28);
+        ctx.fillStyle = '#ffe9a8'; ctx.fillRect(x + w * 0.1, y + 1, w * 0.16, 3); ctx.fillRect(x + w * 0.74, y + 1, w * 0.16, 3);
+        ctx.fillStyle = '#d9dce0'; rr(x, y + cab + 3, w, h - cab - 3, 4); ctx.fill();
+        ctx.fillStyle = 'rgba(0,0,0,0.08)'; for (var s = y + cab + 12; s < y + h - 6; s += 12) ctx.fillRect(x + 3, s, w - 6, 2);
+        ctx.fillStyle = shade(c, -0.2); ctx.fillRect(x + 3, y + cab + 8, w - 6, 6);
+        ctx.fillStyle = '#e74c3c'; ctx.fillRect(x + 2, y + h - 4, w * 0.18, 3); ctx.fillRect(x + w * 0.8 - 2, y + h - 4, w * 0.18, 3);
+        return;
+      }
+      ctx.fillStyle = c; rr(x, y, w, h, w * 0.3); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.14)'; rr(x + w * 0.08, y + h * 0.08, w * 0.18, h * 0.84, w * 0.1); ctx.fill();
+      ctx.fillStyle = 'rgba(0,0,0,0.18)'; rr(x + w * 0.74, y + h * 0.08, w * 0.18, h * 0.84, w * 0.1); ctx.fill();
+      var van = o.kind === 'van';
+      ctx.fillStyle = '#1b2430';
+      ctx.beginPath(); ctx.moveTo(x + w * 0.18, y + h * (van ? 0.16 : 0.24)); ctx.lineTo(x + w * 0.82, y + h * (van ? 0.16 : 0.24)); ctx.lineTo(x + w * 0.76, y + h * (van ? 0.26 : 0.36)); ctx.lineTo(x + w * 0.24, y + h * (van ? 0.26 : 0.36)); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = shade(c, van ? 0.15 : -0.12); rr(x + w * 0.2, y + h * (van ? 0.27 : 0.37), w * 0.6, h * (van ? 0.62 : 0.3), 4); ctx.fill();
+      if (!van) { ctx.fillStyle = '#1b2430'; ctx.beginPath(); ctx.moveTo(x + w * 0.24, y + h * 0.7); ctx.lineTo(x + w * 0.76, y + h * 0.7); ctx.lineTo(x + w * 0.8, y + h * 0.8); ctx.lineTo(x + w * 0.2, y + h * 0.8); ctx.closePath(); ctx.fill(); }
+      ctx.fillStyle = shade(c, -0.25); ctx.fillRect(x - 2, y + h * 0.27, 3, 5); ctx.fillRect(x + w - 1, y + h * 0.27, 3, 5);
+      ctx.fillStyle = '#ffe9a8'; ctx.fillRect(x + w * 0.12, y + 2, w * 0.2, 3); ctx.fillRect(x + w * 0.68, y + 2, w * 0.2, 3);
+      ctx.fillStyle = '#e74c3c'; ctx.fillRect(x + w * 0.1, y + h - 5, w * 0.22, 3); ctx.fillRect(x + w * 0.68, y + h - 5, w * 0.22, 3);
+    }
+    function drawStatic(o){
+      var x = o.x - o.w / 2, y = o.y;
+      if (o.kind === 'cones') {
+        [0.18, 0.5, 0.82].forEach(function(f, i){
+          var cx = x + o.w * f, cy = y + o.h * (i === 1 ? 0.35 : 0.65), r = laneW * 0.1;
+          ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.beginPath(); ctx.arc(cx + 2, cy + 3, r * 1.15, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#2b2b2b'; ctx.fillRect(cx - r * 1.1, cy - r * 1.1, r * 2.2, r * 2.2);
+          ctx.fillStyle = '#ff7a2e'; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+          ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, r * 0.55, 0, Math.PI * 2); ctx.stroke();
+          ctx.fillStyle = '#ffb27a'; ctx.beginPath(); ctx.arc(cx, cy, r * 0.22, 0, Math.PI * 2); ctx.fill();
+        });
+      } else {
+        ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(x + 3, y + 5, o.w, o.h);
+        ctx.save(); rr(x, y, o.w, o.h, 3); ctx.clip();
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(x, y, o.w, o.h);
+        ctx.fillStyle = '#d62f2f';
+        for (var s = -o.h; s < o.w + o.h; s += 16) { ctx.beginPath(); ctx.moveTo(x + s, y + o.h); ctx.lineTo(x + s + 8, y + o.h); ctx.lineTo(x + s + 8 + o.h, y); ctx.lineTo(x + s + o.h, y); ctx.closePath(); ctx.fill(); }
+        ctx.restore();
+        var on = Math.floor((g ? g.t : 0) * 4) % 2 === 0;
+        [x + 4, x + o.w - 4].forEach(function(lx){
+          ctx.fillStyle = on ? '#ffd23f' : '#8a6d1a'; ctx.beginPath(); ctx.arc(lx, y - 3, 4, 0, Math.PI * 2); ctx.fill();
+          if (on) { ctx.fillStyle = 'rgba(255,210,63,0.25)'; ctx.beginPath(); ctx.arc(lx, y - 3, 10, 0, Math.PI * 2); ctx.fill(); }
+        });
+      }
+    }
+
+    function drawPlayer(){
+      var pb = playerBox(), x = pb.x, y = pb.y, w = pb.w, h = pb.h;
+      var blink = g.inv > 0 && Math.floor(g.inv * 12) % 2 === 0;
+      // cans on strings
+      ctx.strokeStyle = 'rgba(220,225,232,0.8)'; ctx.lineWidth = 1;
+      var lag = Math.max(-16, Math.min(16, -(g.vx || 0) * 0.05));
+      [-0.32, 0, 0.32].forEach(function(f, i){
+        var ph = g.t * (running ? 12 : 0) + i * 2.1;
+        var cx = g.x + w * f + lag * (0.7 + i * 0.25) + Math.sin(ph) * 2.5;
+        var cy = y + h + 14 + (i % 2) * 6 + Math.abs(Math.sin(ph * 1.3)) * 3;
+        ctx.beginPath(); ctx.moveTo(g.x + w * f * 0.5, y + h - 2); ctx.quadraticCurveTo(cx, y + h + 6, cx, cy); ctx.stroke();
+        ctx.save(); ctx.translate(cx, cy + 4); ctx.rotate(Math.sin(ph * 0.9) * 0.5 + lag * 0.03);
+        ctx.fillStyle = '#cfd5dc'; rr(-3.5, -4, 7, 9, 1.5); ctx.fill();
+        ctx.fillStyle = '#8a929e'; ctx.fillRect(-3.5, -4, 7, 2);
+        ctx.fillStyle = i === 1 ? '#c0392b' : '#2e86de'; ctx.fillRect(-3.5, 0, 7, 2);
+        ctx.restore();
+      });
+      if (blink) return;
+      ctx.save();
+      ctx.translate(g.x, y + h / 2); ctx.rotate(Math.max(-0.18, Math.min(0.18, (g.vx || 0) * 0.0009))); ctx.translate(-g.x, -(y + h / 2));
+      ctx.fillStyle = 'rgba(0,0,0,0.35)'; rr(x + 4, y + 6, w, h, w * 0.32); ctx.fill();
+      ctx.fillStyle = '#f7f4ee'; rr(x, y, w, h, w * 0.32); ctx.fill();
+      ctx.fillStyle = 'rgba(0,0,0,0.10)'; rr(x + w * 0.76, y + h * 0.08, w * 0.16, h * 0.84, w * 0.08); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.7)'; rr(x + w * 0.08, y + h * 0.1, w * 0.12, h * 0.8, w * 0.06); ctx.fill();
+      // windshield, roof, rear window
+      ctx.fillStyle = '#22314a';
+      ctx.beginPath(); ctx.moveTo(x + w * 0.16, y + h * 0.24); ctx.lineTo(x + w * 0.84, y + h * 0.24); ctx.lineTo(x + w * 0.78, y + h * 0.37); ctx.lineTo(x + w * 0.22, y + h * 0.37); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.fillRect(x + w * 0.24, y + h * 0.26, w * 0.18, 2);
+      ctx.fillStyle = '#ebe6dc'; rr(x + w * 0.2, y + h * 0.38, w * 0.6, h * 0.3, 5); ctx.fill();
+      ctx.fillStyle = '#22314a'; ctx.beginPath(); ctx.moveTo(x + w * 0.22, y + h * 0.7); ctx.lineTo(x + w * 0.78, y + h * 0.7); ctx.lineTo(x + w * 0.82, y + h * 0.79); ctx.lineTo(x + w * 0.18, y + h * 0.79); ctx.closePath(); ctx.fill();
+      // bow on the roof
+      ctx.fillStyle = '#e8607a';
+      ctx.beginPath(); ctx.moveTo(g.x, y + h * 0.53); ctx.lineTo(g.x - w * 0.22, y + h * 0.45); ctx.lineTo(g.x - w * 0.22, y + h * 0.61); ctx.closePath(); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(g.x, y + h * 0.53); ctx.lineTo(g.x + w * 0.22, y + h * 0.45); ctx.lineTo(g.x + w * 0.22, y + h * 0.61); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#c94461'; ctx.beginPath(); ctx.arc(g.x, y + h * 0.53, w * 0.07, 0, Math.PI * 2); ctx.fill();
+      // ribbons from the mirrors
+      var fl = Math.sin(g.t * 14) * 3;
+      ctx.strokeStyle = '#e8607a'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x - 1, y + h * 0.3); ctx.quadraticCurveTo(x - 6 + fl, y + h * 0.45, x - 3 - fl, y + h * 0.6); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(x + w + 1, y + h * 0.3); ctx.quadraticCurveTo(x + w + 6 - fl, y + h * 0.45, x + w + 3 + fl, y + h * 0.6); ctx.stroke();
+      ctx.fillStyle = '#d9d4ca'; ctx.fillRect(x - 3, y + h * 0.27, 4, 6); ctx.fillRect(x + w - 1, y + h * 0.27, 4, 6);
+      // heart on the trunk, lights
+      heart(g.x, y + h * 0.83, w * 0.2, '#c0392b');
+      ctx.fillStyle = '#fff6cf'; ctx.fillRect(x + w * 0.12, y + 2, w * 0.2, 3); ctx.fillRect(x + w * 0.68, y + 2, w * 0.2, 3);
+      ctx.fillStyle = '#e74c3c'; ctx.fillRect(x + w * 0.08, y + h - 5, w * 0.2, 3); ctx.fillRect(x + w * 0.72, y + h - 5, w * 0.2, 3);
+      ctx.restore();
+    }
+
+    function drawParts(){
+      g.parts.forEach(function(q){
+        var a = Math.max(0, q.life / q.max);
+        ctx.globalAlpha = a;
+        if (q.kind === 'heart') heart(q.x, q.y, q.r * 1.6, q.c);
+        else if (q.kind === 'confetti') { ctx.save(); ctx.translate(q.x, q.y); ctx.rotate(q.rot); ctx.fillStyle = q.c; ctx.fillRect(-q.r, -q.r * 0.5, q.r * 2, q.r); ctx.restore(); }
+        else { ctx.fillStyle = q.c; ctx.beginPath(); ctx.arc(q.x, q.y, q.r, 0, Math.PI * 2); ctx.fill(); }
+      });
+      ctx.globalAlpha = 1;
+    }
+
+    function drawTerminal(){
+      if (!g.terminal) return;
+      var ty = g.terminal.y, th = H * 0.3;
+      ctx.fillStyle = '#8a929e'; ctx.fillRect(0, ty + th - 10, W, 12);
+      ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.fillRect(10, ty + 8, W - 14, th);
+      ctx.fillStyle = '#d9dde3'; rr(6, ty, W - 12, th, 10); ctx.fill();
+      ctx.fillStyle = '#2b3a55'; rr(18, ty + 12, W - 36, th * 0.42, 6); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      for (var gx = 30; gx < W - 30; gx += 26) ctx.fillRect(gx, ty + 14, 2, th * 0.42 - 4);
+      var fs = Math.round(th * 0.22); ctx.font = '800 ' + fs + 'px ' + DISPLAY;
+      while (ctx.measureText('FLUGHAFEN STR').width > W - 60 && fs > 10) { fs--; ctx.font = '800 ' + fs + 'px ' + DISPLAY; }
+      ctx.fillStyle = '#2b3a55'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('FLUGHAFEN STR', W / 2, ty + th * 0.74);
+    }
+
+    function drawHUD(){
+      var p = progress();
+      ctx.fillStyle = 'rgba(11,14,19,0.82)'; rr(10, 10, W - 20, 50, 12); ctx.fill();
+      ctx.font = '600 11px ' + MONO; ctx.textBaseline = 'middle'; ctx.fillStyle = '#e8eaee';
+      ctx.textAlign = 'left'; ctx.fillText('SCHORNDORF', 22, 26);
+      ctx.textAlign = 'right'; ctx.fillText('STR', W - 40, 26);
+      planeTop(W - 26, 26, 0.13, Math.PI / 2, '#f2c230');
+      for (var k = 0; k < 3; k++) heart(W / 2 - 22 + k * 22, 18, 14, k < g.lives ? '#e8607a' : '#3a414d');
+      var bx = 22, bw = W - 44, by = 46;
+      ctx.fillStyle = '#2a313c'; rr(bx, by - 2, bw, 5, 2.5); ctx.fill();
+      ctx.fillStyle = '#f2c230'; rr(bx, by - 2, Math.max(5, bw * p), 5, 2.5); ctx.fill();
+      ctx.fillStyle = '#f7f4ee'; rr(bx + bw * p - 6, by - 5, 12, 11, 3); ctx.fill();
+      ctx.fillStyle = '#e8607a'; ctx.fillRect(bx + bw * p - 2, by - 3, 4, 7);
+    }
+
+    function draw(){
+      if (!W) return;
+      ctx.save();
+      if (g && g.shake > 0) ctx.translate((Math.random() - 0.5) * 8 * g.shake / 0.35, (Math.random() - 0.5) * 8 * g.shake / 0.35);
+      drawGround();
+      if (g) {
+        g.deco.forEach(drawDeco);
+        drawTerminal();
+        g.obs.forEach(function(o){ if (o.rel === 1) drawStatic(o); else drawCar(o); });
+        drawPlayer();
+        drawParts();
+        if (g.plane && !g.plane.gone) {
+          planeTop(g.plane.x + 40, g.plane.y + 70, 1.5, -2.2, 'rgba(0,0,0,0.18)');
+          planeTop(g.plane.x, g.plane.y, 1.5, -2.2, '#f4f6f8');
+          ctx.fillStyle = '#2e86de'; ctx.save(); ctx.translate(g.plane.x, g.plane.y); ctx.rotate(-2.2); ctx.fillRect(-3, -30, 6, 40); ctx.restore();
+        }
+        // speed streaks
+        var p = progress();
+        if (running && g.count <= 0 && p > 0.4) {
+          ctx.strokeStyle = 'rgba(255,255,255,' + (0.08 + 0.12 * p) + ')'; ctx.lineWidth = 1;
+          for (var i = 0; i < 6; i++) { var sx = (i % 2 ? roadX - 30 - (i * 7) % 40 : roadX + roadW + 30 + (i * 11) % 40), sy = (g.scroll * 1.6 + i * 97) % (H + 60) - 60; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx, sy + 40); ctx.stroke(); }
+        }
+      }
+      ctx.restore();
+      ctx.fillStyle = vignette; ctx.fillRect(0, 0, W, H);
+      if (g && g.flash > 0) { ctx.fillStyle = 'rgba(214,47,47,' + (0.35 * g.flash) + ')'; ctx.fillRect(0, 0, W, H); }
+      if (g) drawHUD();
+      if (g && g.count > 0 && running) {
+        var n = Math.ceil(g.count / 0.8), txt = n > 0 ? String(n) : 'LOS!';
+        var f = (g.count % 0.8) / 0.8;
+        ctx.save(); ctx.translate(W / 2, H * 0.45); ctx.scale(1 + f * 0.4, 1 + f * 0.4);
+        ctx.font = '800 96px ' + DISPLAY; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillStyle = 'rgba(0,0,0,0.45)'; ctx.fillText(txt, 4, 6);
+        ctx.fillStyle = '#f2c230'; ctx.fillText(txt, 0, 0);
+        ctx.restore();
+      }
+    }
+
+    // ---------- flow ----------
+    function loop(ts){
+      if (!running) return;
+      var dt = Math.min(0.05, (ts - last) / 1000); last = ts;
+      step(dt); draw();
+      if (running) raf = requestAnimationFrame(loop);
+    }
+    function overlay(title, text, btn, skip){
+      $('gameTitle').textContent = title; $('gameText').textContent = text;
+      $('gameBtn').textContent = btn; $('gameSkip').hidden = !skip;
+      $('gameOverlay').hidden = false;
+    }
+    function start(){
+      if (state.arrived) { $('secBody').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' }); return; }
+      var resume = g && !g.done && g.lives > 0 && g.paused;
+      if (!resume) newGame();
+      if (g) g.paused = false;
+      $('gameOverlay').hidden = true; running = true; last = performance.now();
+      raf = requestAnimationFrame(loop);
+    }
+    function crash(){
+      running = false; attempts++; draw();
+      log('Stau auf dem Weg zum Flughafen. Versuch ' + attempts + '.', 'warn');
+      overlay('Stau!', 'Drei Treffer, ihr steckt fest. Gleich nochmal?', 'Nochmal', attempts >= 2);
+    }
+    function confetti(){
+      var cols = ['#f2c230', '#e8607a', '#ffffff', '#2e86de', '#52d19a'];
+      for (var i = 0; i < 90; i++) g.parts.push({ kind: 'confetti', x: W / 2 + (Math.random() - 0.5) * 60, y: H * 0.45, vx: (Math.random() - 0.5) * 420, vy: -150 - Math.random() * 320, life: 2.2, max: 2.2, c: cols[i % cols.length], r: 3 + Math.random() * 3, rot: Math.random() * 6, vr: (Math.random() - 0.5) * 12 });
+    }
+    function finish(){
+      running = false; g.done = true; g.obs = []; confetti();
+      var t0 = performance.now();
+      (function celebrate(ts){
+        var dt = 1 / 60;
+        for (var k = g.parts.length - 1; k >= 0; k--) { var q = g.parts[k]; q.life -= dt; if (q.life <= 0) { g.parts.splice(k, 1); continue; } q.x += q.vx * dt; q.y += q.vy * dt; if (q.kind === 'confetti') { q.vy += 260 * dt; q.rot += q.vr * dt; } }
+        draw();
+        if (performance.now() - t0 < 2200 && !running) requestAnimationFrame(celebrate);
+      })();
+      arrive(false);
+      setTimeout(function(){ overlay('Angekommen', 'Willkommen am Flughafen STR. Die Sicherheitskontrolle ist jetzt offen.', 'Zur Kontrolle', false); }, 900);
+    }
+    function pause(){
+      if (!running) return;
+      running = false; cancelAnimationFrame(raf); if (g) g.paused = true;
+      overlay('Pause', 'Kurz rechts rangefahren.', 'Weiterfahren', false);
+    }
+    function showStart(){
+      running = false; cancelAnimationFrame(raf); attempts = 0;
+      newGame();
+      if (state.arrived) { g.done = true; g.t = TOTAL; g.terminal = { y: H * 0.16 }; draw(); overlay('Angekommen', 'Ihr seid schon am Flughafen STR. Die Sicherheitskontrolle ist offen.', 'Zur Kontrolle', false); }
+      else { draw(); overlay('Schorndorf → STR', 'Tippt links oder rechts auf die Straße, um die Spur zu wechseln. Am PC gehen auch die Pfeiltasten.', 'Losfahren', false); }
+    }
+
+    $('gameBtn').addEventListener('click', start);
+    $('gameSkip').addEventListener('click', function(){
+      running = false; newGame(); g.done = true; g.t = TOTAL; g.terminal = { y: H * 0.16 }; draw(); arrive(true);
+      overlay('Angekommen', 'Über die Landstraße geschafft. Die Sicherheitskontrolle ist jetzt offen.', 'Zur Kontrolle', false);
+    });
+    $('laneLeft').addEventListener('click', function(){ move(-1); });
+    $('laneRight').addEventListener('click', function(){ move(1); });
+    cv.addEventListener('pointerdown', function(e){
+      var r = cv.getBoundingClientRect(); move(e.clientX - r.left < r.width / 2 ? -1 : 1);
+    });
+    document.addEventListener('keydown', function(e){
+      if (!running) return;
+      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') { e.preventDefault(); move(-1); }
+      if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') { e.preventDefault(); move(1); }
+    });
+    document.addEventListener('visibilitychange', function(){ if (document.hidden) pause(); });
+    window.addEventListener('resize', size);
+    size();
+    return { showStart: showStart, size: size };
+  })();
+
+  boot(); renderStep(); applyArrived(); game.showStart();
   if (state.step >= 3) finish(false);
 
   try {
